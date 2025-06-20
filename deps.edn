@@ -5,18 +5,18 @@
  {:run {:main-opts ["-m" "initiae.core"]}
   
   :test {:extra-paths ["test"]
-         :extra-depts {io.github.cognitect-labs/test-runner
+         :extra-deps {io.github.cognitect-labs/test-runner
                        {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
          :main-opts ["-m" "cognitect.test-runner"]
          :exec-fn cognitect.test-runner.api/test}
   
-  :lint {:extra-depts {clj-kondo/clj-kondo
+  :lint {:extra-deps {clj-kondo/clj-kondo
                        {:git/url "https://github.com/clj-kondo/clj-kondo"
                         :git/tag "v2025.06.05"
                         :git/sha "341364f"}}
          :main-opts ["-m" "clj-kondo.main"]}
   
-  :format {:extra-depts {mvxcvi/cljstyle
+  :format {:extra-deps {mvxcvi/cljstyle
                        {:git/url "https://github.com/greglook/cljstyle"
                         :git/tag "0.17.642"
                         :git/sha "63a4cf4"}}

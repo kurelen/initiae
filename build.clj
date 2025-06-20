@@ -1,5 +1,7 @@
 (ns build
-  (:require [clojure.tools.build.api :as b]))
+  (:require
+    [clojure.tools.build.api :as b]))
+
 
 (def lib 'initiae)
 (def version "0.1.0")
@@ -7,10 +9,14 @@
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
 
-(defn clean [_]
+
+(defn clean
+  [_]
   (b/delete {:path "target"}))
 
-(defn uber [_]
+
+(defn uber
+  [_]
   (clean nil)
   (b/copy-dir {:src-dirs ["src"] :target-dir class-dir})
   (b/compile-clj {:basis basis :src-dirs ["src"] :class-dir class-dir})
