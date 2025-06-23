@@ -1,7 +1,7 @@
 (ns initiae.core-test
   (:require
-    [clojure.test :refer :all]
-    [initiae.core :refer :all]))
+    [clojure.test :refer [deftest is]]
+    [initiae.core :refer [greet]))
 
 
 (deftest test-greet
