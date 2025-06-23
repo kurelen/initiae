@@ -1,7 +1,9 @@
 [
  {
   :ausgangsform
-  "O du honigfliessender herre Jesu süsse und lustlichen … ich bitte dich demütiklichen"
+  [
+   "O du honigfliessender herre Jesu süsse und lustlichen … ich bitte dich demütiklichen"
+   ]
   :substrings
   [
    "O du honigfliessender herre Jesu süsse und lustlichen … ich bitte dich"
@@ -32,7 +34,9 @@
   }
  {
   :ausgangsform
-  "Freuw dich du allererlichste gottes gebererin alle zyt jungfrauw Maria das du von deinem allerliebsten son … bist uffgenumen"
+  [
+   "Freuw dich du allererlichste gottes gebererin alle zyt jungfrauw Maria das du von deinem allerliebsten son … bist uffgenumen"
+   ]
   :substrings
   [
    "Frew dich du allererlichste gottes gebererin alle zyt jungfraw Maria das du von deinem allerliebsten son"
