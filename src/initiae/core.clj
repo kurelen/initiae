@@ -3,7 +3,8 @@
   (:require
     [clojure.edn :as edn]
     [clojure.java.io :as io]
-    [initiae.distance :refer [distance-matrix weighted-levenshtein]]))
+    [clojure.string :refer [join]]
+    [initiae.distance :as dist]))
 
 
 (defn load-fixture
@@ -21,14 +22,28 @@
 
 
 (defn print-matrix
-  [matrix]
-  (doseq [row matrix]
+  [v matrix]
+  (doseq [row (map #(str %1 "\t" (join "\t" %2)) v matrix)]
     (println row)))
+
+
+(def dist-fns
+  [["Longest Common Subsequence" dist/lcs]
+   ["Cosine Distance" dist/cosine]
+   ["Jaccard Distance" dist/jaccard]
+   ["Jaro-Winkler Distance" dist/jaro-winkler]
+   ["Levenshtein Distance" dist/levenshtein]
+   ["Levenshtein Distance with free delete" (dist/levenshtein-fn {:delete 0})]
+   ["Levenshtein Distance with free substitute" (dist/levenshtein-fn {:substitute 0})]
+   ["Levenshtein Distance with free insert" (dist/levenshtein-fn {:insert 0})]])
 
 
 (defn -main
   [& _]
-  (let [initiae (flatten-fixture (load-fixture))
-        distances (distance-matrix initiae weighted-levenshtein)]
-    (print-matrix initiae)
-    (print-matrix distances)))
+  (let [initiae (flatten-fixture (load-fixture))]
+  (doseq [[fn-name dist-fn] dist-fns]
+      (println)
+      (println fn-name)
+      (println "---")
+      (print-matrix initiae (dist/distance-matrix initiae dist-fn))
+      (println "---"))))

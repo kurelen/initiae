@@ -2,7 +2,7 @@
 echo "Running code formatter..."
 make format
 
-if [ $? -ne 0]; then
+if [ $? -ne 0 ]; then
   echo "Code formatting failed. Commit aborted."
   exit 1
 fi
