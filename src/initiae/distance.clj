@@ -1,10 +1,24 @@
 (ns initiae.distance
   (:import
-    (org.apache.commons.text.similarity
-      LevenshteinDistance)))
+    [org.apache.commons.text.similarity
+      LevenshteinDistance
+      LevenshteinDetailedDistance]))
 
+(defn levenshtein
+  "Returns distance of two string"
+  [s1 s2]
+  (.apply (LevenshteinDistance.) s1 s2))
 
 (defn weighted-levenshtein
+  "Returns distance of two string"
+  [opts]
+  (let [{:keys [distance insert substitute delete]
+         :or {distance 1 insert 1 substitute 1 delete 1}}
+        opts]
+    (fn [] [distance insert substitute delete])))
+
+
+(defn levenshtein
   "Returns distance of two string"
   [s1 s2]
   (.apply (LevenshteinDistance.) s1 s2))

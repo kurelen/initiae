@@ -1,17 +1,23 @@
 (ns initiae.distance-test
   (:require
     [clojure.test :refer [deftest are is]]
-    [initiae.distance :refer [weighted-levenshtein distance-matrix]]))
+    [initiae.distance :refer [weighted-levenshtein levenshtein distance-matrix]]))
 
 
-(deftest test-weighted-levenshtein
+(deftest test-levenshtein
   (are [x y] (= x y)
-    0 (weighted-levenshtein "haus" "haus")
-    1 (weighted-levenshtein "haus" "maus")
-    2 (weighted-levenshtein "haus" "maut")
-    2 (weighted-levenshtein "haus" "mas")))
+    0 (levenshtein "haus" "haus")
+    1 (levenshtein "haus" "maus")
+    2 (levenshtein "haus" "maut")
+    2 (levenshtein "haus" "mas")))
 
 
 (deftest test-distance-matrix
-  (is (= [[0]] (distance-matrix ["haus"] weighted-levenshtein)))
-  (is (= [[0 1] [1 0]] (distance-matrix ["haus" "maus"] weighted-levenshtein))))
+  (is (= [[0]] (distance-matrix ["haus"] levenshtein)))
+  (is (= [[0 1] [1 0]] (distance-matrix ["haus" "maus"] levenshtein))))
+
+(deftest test-weighted-levenshtein
+  (is (= [1 1 1 1] ((weighted-levenshtein {})))) 
+  (is (= [1 2 3 4]
+         ((weighted-levenshtein {:substite 1 :insert 2 :delete 3 :distance 4})))))
+
