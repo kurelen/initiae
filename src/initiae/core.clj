@@ -27,7 +27,7 @@
 
 
 (defn -main
-  [& args]
+  [& _]
   (let [initiae (flatten-fixture (load-fixture))
         distances (distance-matrix initiae weighted-levenshtein)]
     (print-matrix initiae)
