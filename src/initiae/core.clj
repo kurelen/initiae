@@ -40,7 +40,9 @@
 
 (defn -main
   [& _]
-  (let [initiae (flatten-fixture (load-fixture))]
+  (let [initiae (-> (load-fixture)
+                    (flatten-fixture)
+                    (shuffle))]
   (doseq [[fn-name dist-fn] dist-fns]
       (println)
       (println fn-name)
