@@ -3,7 +3,7 @@
   (:require
     [clojure.edn :as edn]
     [clojure.java.io :as io]
-    [initiae.distance :refer [distance-matrix levenshtein weighted-levenshtein]]))
+    [initiae.distance :refer [distance-matrix levenshtein]]))
 
 
 (defn load-fixture
