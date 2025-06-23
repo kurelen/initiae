@@ -1,5 +1,6 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.12.1"}}
+ :deps {org.clojure/clojure {:mvn/version "1.12.1"}
+        org.apache.commons/commons-text {:mvn/version "1.13.1"}}
 
  :aliases
  {:run {:main-opts ["-m" "initiae.core"]}
