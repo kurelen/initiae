@@ -1,0 +1,31 @@
+name: Run tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_requests:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Clojure
+        uses: DeLaGuardo/setup-clojure@12
+        with:
+          cli: 1.12.1
+
+      - name: Cache Clojure dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-clojure-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-clojure
+
+      - name: Run tests
+        run: make test
