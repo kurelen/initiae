@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "Running tests..."
+make test
+
+if [ $? -ne 0]; then
+  echo "Running tests failed. Push aborted."
+  exit 1
+fi
