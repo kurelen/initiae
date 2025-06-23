@@ -16,8 +16,7 @@
   (is (= [[0]] (distance-matrix ["haus"] levenshtein)))
   (is (= [[0 1] [1 0]] (distance-matrix ["haus" "maus"] levenshtein))))
 
-(deftest test-weighted-levenshtein
-  (is (= [1 1 1 1] ((weighted-levenshtein {})))) 
-  (is (= [1 2 3 4]
-         ((weighted-levenshtein {:substite 1 :insert 2 :delete 3 :distance 4})))))
 
+(deftest test-weighted-levenshtein
+  (is (= 1 ((weighted-levenshtein) "haus" "maus")))
+  (is (= 2 ((weighted-levenshtein {:substitute 2}) "haus" "maus"))))
