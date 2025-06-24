@@ -4,7 +4,8 @@
     [clojure.edn :as edn]
     [clojure.java.io :as io]
     [clojure.string :refer [join]]
-    [initiae.distance :as dist]))
+    [initiae.distance :as dist]
+    [initiae.similarize :refer [similarize]]))
 
 
 (defn load-fixture
@@ -47,5 +48,5 @@
       (println)
       (println fn-name)
       (println "---")
-      (print-matrix initiae (dist/distance-matrix initiae dist-fn))
+      (print-matrix initiae (dist/distance-matrix initiae (similarize dist-fn)))
       (println "---"))))
