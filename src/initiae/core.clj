@@ -43,7 +43,7 @@
   (let [initiae (-> (load-fixture)
                     (flatten-fixture)
                     (shuffle))]
-  (doseq [[fn-name dist-fn] dist-fns]
+    (doseq [[fn-name dist-fn] dist-fns]
       (println)
       (println fn-name)
       (println "---")
