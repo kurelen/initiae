@@ -6,6 +6,13 @@
 
 (def eps 0.1)
 
+(deftest test-ngram
+  (are [x y] (= x y)
+    0.0 (m/ngram "haus" "haus")
+    0.375 (m/ngram "haus" "maus")
+    0.5 (m/ngram "haus" "maut")
+    0.75 (m/ngram "haus" "mas")))
+
 
 (deftest test-lcs-dist
   (are [x y] (= x y)

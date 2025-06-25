@@ -1,6 +1,6 @@
 (ns initiae.text-metric
   (:import
-    (org.apache.commons.text.similarity
+    [org.apache.commons.text.similarity
       CosineDistance
       JaccardDistance
       JaccardSimilarity
@@ -8,8 +8,12 @@
       JaroWinklerSimilarity
       LevenshteinDetailedDistance
       LevenshteinDistance
-      LongestCommonSubsequenceDistance)))
+      LongestCommonSubsequenceDistance]
+    [info.debatty.java.stringsimilarity NGram]))
 
+(defn ngram
+  [s1 s2]
+  (.distance (NGram.) s1 s2))
 
 (defn- max-length-similarize
   [dist-fn]
@@ -99,4 +103,6 @@
   ([] levenshtein-sim)
   ([weights]
    (max-length-similarize (levenshtein-dist-fn weights))))
-; This is not correct
+
+
+;; This is not correct
