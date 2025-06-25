@@ -33,7 +33,12 @@
    ["Cosine Distance" metric/cosine-sim]
    ["Jaccard Distance" metric/jaccard-sim]
    ["Jaro-Winkler Distance" metric/jaro-winkler-sim]
-   ["Levenshtein Distance" metric/levenshtein-sim]])
+   ["Levenshtein Distance" metric/levenshtein-sim]
+   ["Weighted Levenshtein"
+    (metric/weighted-levenshtein-dist-fn
+      {:substitue (fn [a b] (if (= a b) 0.0 0.5))
+       :delete (fn [c] (if (#{\a \e \i \o \u} c) 0.2 1.0))
+       :insert (constantly 0.8)})]])
 
 
 (defn -main
