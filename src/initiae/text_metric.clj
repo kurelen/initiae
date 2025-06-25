@@ -83,7 +83,7 @@
                  (max (count s1) (count s2)))))
   ([limit s1 s2] (- 1.0
                     (/ (levenshtein-dist limit s1 s2)
-                       (max (count s1) (count s2) limit)))))
+                       (min limit (max (count s1) (count s2)))))))
 
 
 (defn damerau-dist
@@ -123,3 +123,19 @@
                       (deletionCost [_ c] (delete c)))
         o (WeightedLevenshtein. char-sub char-change)]
     (fn [s1 s2] (.distance o s1 s2 limit))))
+
+
+(defn- default-upperbound
+  [s1 s2]
+  (max s1 s2))
+
+
+(defn weighted-levenshtein-sim-fn
+  "Returns weighted levenshtein similarity function between two string. Options have to be supplied with keys :substitute  (binary cost fn) :insert (unary cost fn) :delete (unary cost fn) :limit (int) and :upperbound (cost fn in length of strings and limit)"
+  [opts]
+  (let [{:keys [upperbound]
+         :or {upperbound default-upperbound}} opts
+        dist-fn (weighted-levenshtein-dist-fn opts)]
+    (fn [s1 s2]
+      (- 1.0 (/ (dist-fn s1 s2)
+                (upperbound (count s1) (count s2)))))))
