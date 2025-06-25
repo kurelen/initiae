@@ -3,7 +3,9 @@
     (org.apache.commons.text.similarity
       CosineDistance
       JaccardDistance
+      JaccardSimilarity
       JaroWinklerDistance
+      JaroWinklerSimilarity
       LevenshteinDetailedDistance
       LevenshteinDistance
       LongestCommonSubsequenceDistance)))
@@ -51,7 +53,7 @@
 (defn jaccard-sim
   "Returns jaccard similarity between two strings"
   [s1 s2]
-  ((max-length-similarize jaccard-dist) s1 s2))
+  (.apply (JaccardSimilarity.) s1 s2))
 
 
 (defn jaro-winkler-dist
@@ -63,7 +65,7 @@
 (defn jaro-winkler-sim
   "Returns jaccard similarity between two strings"
   [s1 s2]
-  ((max-length-similarize jaro-winkler-dist) s1 s2))
+  (.apply (JaroWinklerSimilarity.) s1 s2))
 
 
 (defn levenshtein-dist
@@ -97,3 +99,4 @@
   ([] levenshtein-sim)
   ([weights]
    (max-length-similarize (levenshtein-dist-fn weights))))
+; This is not correct
