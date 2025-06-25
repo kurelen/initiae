@@ -33,10 +33,7 @@
    ["Cosine Distance" metric/cosine-sim]
    ["Jaccard Distance" metric/jaccard-sim]
    ["Jaro-Winkler Distance" metric/jaro-winkler-sim]
-   ["Levenshtein Distance" metric/levenshtein-sim]
-   ["Levenshtein Distance with free delete" (metric/levenshtein-sim-fn {:delete 0})]
-   ["Levenshtein Distance with free substitute" (metric/levenshtein-sim-fn {:substitute 0})]
-   ["Levenshtein Distance with free insert" (metric/levenshtein-sim-fn {:insert 0})]])
+   ["Levenshtein Distance" metric/levenshtein-sim]])
 
 
 (defn -main
