@@ -4,8 +4,8 @@
     [clojure.edn :as edn]
     [clojure.java.io :as io]
     [clojure.string :refer [join]]
-    [initiae.distance :as dist]
-    [initiae.similarize :refer [similarize]]))
+    [initiae.matrix :as matrix]
+    [initiae.text-metric :as metric]))
 
 
 (defn load-fixture
@@ -28,24 +28,24 @@
     (println row)))
 
 
-(def dist-fns
-  [["Longest Common Subsequence" dist/lcs]
-   ["Cosine Distance" dist/cosine]
-   ["Jaccard Distance" dist/jaccard]
-   ["Jaro-Winkler Distance" dist/jaro-winkler]
-   ["Levenshtein Distance" dist/levenshtein]
-   ["Levenshtein Distance with free delete" (dist/levenshtein-fn {:delete 0})]
-   ["Levenshtein Distance with free substitute" (dist/levenshtein-fn {:substitute 0})]
-   ["Levenshtein Distance with free insert" (dist/levenshtein-fn {:insert 0})]])
+(def named-fns
+  [["Longest Common Subsequence" metric/lcs-sim]
+   ["Cosine Distance" metric/cosine-sim]
+   ["Jaccard Distance" metric/jaccard-sim]
+   ["Jaro-Winkler Distance" metric/jaro-winkler-sim]
+   ["Levenshtein Distance" metric/levenshtein-sim]
+   ["Levenshtein Distance with free delete" (metric/levenshtein-sim-fn {:delete 0})]
+   ["Levenshtein Distance with free substitute" (metric/levenshtein-sim-fn {:substitute 0})]
+   ["Levenshtein Distance with free insert" (metric/levenshtein-sim-fn {:insert 0})]])
 
 
 (defn -main
   [& _]
   (let [initiae (-> (load-fixture)
                     (flatten-fixture))]
-    (doseq [[fn-name dist-fn] dist-fns]
+    (doseq [[s f] named-fns]
       (println)
-      (println fn-name)
+      (println s)
       (println "---")
-      (print-matrix initiae (dist/distance-matrix initiae (similarize dist-fn)))
+      (print-matrix initiae (matrix/gen-symmetric f initiae))
       (println "---"))))
