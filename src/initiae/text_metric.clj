@@ -76,5 +76,3 @@
   ([s1 s2] (/ (levenshtein-dist s1 s2) (max (count s1) (count s2))))
   ([limit s1 s2] (/ (levenshtein-dist limit s1 s2)
                     (max (count s1) (count s2) limit))))
-
-
