@@ -6,6 +6,7 @@
       JaroWinkler
       Levenshtein
       LongestCommonSubsequence
+      MetricLCS
       NGram)))
 
 
@@ -26,7 +27,7 @@
 (defn lcs-sim
   "Returns longest common subsequence similarity between two strings"
   [s1 s2]
-  (/ (lcs-dist s1 s2) (+ (count s1) (count s2))))
+  (.distance (MetricLCS.) s1 s2))
 
 
 (defn cosine-dist
