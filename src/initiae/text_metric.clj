@@ -96,9 +96,9 @@
               (/ (levenshtein-dist s1 s2)
                  (max (count s1) (count s2)))))
   ([s1 s2 {:keys [limit] :or {limit Integer/MAX_VALUE}}]
-           (- 1.0
-                    (/ (levenshtein-dist s1 s2 {:limit limit})
-                       (min limit (max (count s1) (count s2)))))))
+   (- 1.0
+      (/ (levenshtein-dist s1 s2 {:limit limit})
+         (min limit (max (count s1) (count s2)))))))
 
 
 (defn damerau-dist
