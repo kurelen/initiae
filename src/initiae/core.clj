@@ -67,8 +67,6 @@
   ;;                    (flatten-fixture))]
   (let [initiae (load-fixture-list)]
     (doseq [[s f] named-fns]
-      (println)
       (println s)
-      (println "---")
       (print-matrix initiae (matrix/gen-symmetric f initiae))
-      (println "---"))))
+      (println))))
