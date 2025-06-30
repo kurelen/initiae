@@ -56,7 +56,6 @@
    ["Levenshtein similarity" metric/levenshtein-sim]
    ["Damerau distance" metric/damerau-dist]
    ["Damerau similarity" metric/damerau-sim]
-   ["Damerau similarity" metric/damerau-dist]
    ["Weighted Levenshtein distance" (metric/weighted-levenshtein-dist-fn weights)]
    ["Weighted Levenshtein similarity" (metric/weighted-levenshtein-sim-fn weights)]])
 
