@@ -28,17 +28,29 @@
     (println row)))
 
 
+(def weights
+  {:substitue (fn [a b] (if (= a b) 0.0 0.5))
+   :delete (fn [c] (if (#{\a \e \i \o \u} c) 0.2 1.0))
+   :insert (constantly 0.8)})
+
+
 (def named-fns
-  [["Longest Common Subsequence" metric/lcs-sim]
-   ["Cosine Distance" metric/cosine-sim]
-   ["Jaccard Distance" metric/jaccard-sim]
-   ["Jaro-Winkler Distance" metric/jaro-winkler-sim]
-   ["Levenshtein Distance" metric/levenshtein-sim]
-   ["Weighted Levenshtein"
-    (metric/weighted-levenshtein-dist-fn
-      {:substitue (fn [a b] (if (= a b) 0.0 0.5))
-       :delete (fn [c] (if (#{\a \e \i \o \u} c) 0.2 1.0))
-       :insert (constantly 0.8)})]])
+  [["NGram similarity" metric/ngram-sim]
+   ["Longest Common Subsequence distance" metric/lcs-dist]
+   ["Longest Common Subsequence similarity" metric/lcs-sim]
+   ["Cosine distance" metric/cosine-dist]
+   ["Cosine similarity" metric/cosine-sim]
+   ["Jaccard distance" metric/jaccard-dist]
+   ["Jaccard similarity" metric/jaccard-sim]
+   ["Jaro-Winkler distance" metric/jaro-winkler-dist]
+   ["Jaro-Winkler similarity" metric/jaro-winkler-sim]
+   ["Levenshtein distance" metric/levenshtein-dist]
+   ["Levenshtein similarity" metric/levenshtein-sim]
+   ["Damerau distance" metric/damerau-dist]
+   ["Damerau similarity" metric/damerau-sim]
+   ["Damerau similarity" metric/damerau-dist]
+   ["Weighted Levenshtein distance" (metric/weighted-levenshtein-dist-fn weights)]
+   ["Weighted Levenshtein similarity" (metric/weighted-levenshtein-sim-fn weights)]])
 
 
 (defn -main

@@ -17,10 +17,10 @@
 
 (deftest test-ngram-sim-fn
   (are [x y] (< (abs (- x y)) eps)
-    0.70 (m/ngram-sim 3 "haus" "park")
-    0.72 (m/ngram-sim 4 "haus" "park")
-    0.25 (m/ngram-sim 5 "haus" "park")
-    0.25 (m/ngram-sim 6 "haus" "park")))
+    0.70 (m/ngram-sim "haus" "park" {:ngram-length 3})
+    0.72 (m/ngram-sim "haus" "park" {:ngram-length 4})
+    0.25 (m/ngram-sim "haus" "park" {:ngram-length 5})
+    0.25 (m/ngram-sim "haus" "park" {:ngram-length 6})))
 
 
 (deftest test-cosine-dist
