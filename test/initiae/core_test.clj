@@ -1,11 +1,11 @@
 (ns initiae.core-test
   (:require
     [clojure.test :refer [deftest is]]
-    [initiae.core :refer [load-fixture flatten-fixture]]))
+    [initiae.core :refer [load-fixture-edn flatten-fixture]]))
 
 
-(deftest test-fixture
-  (let [data (load-fixture)]
+(deftest test-fixture-edn
+  (let [data (load-fixture-edn)]
     (is (vector? data))
     (doseq [entry data]
       (doseq [[_ value] entry]
