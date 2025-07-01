@@ -25,6 +25,7 @@
           (for [j (range n)]
             (get ms (if (<= i j) [i j] [j i]))))))))
 
+
 (defn pairwise
   "Constructs a matrix by applying a binary function `f` to all ordered pairs of elements
   from one or two input vectors.
@@ -46,11 +47,13 @@
   - A nested vector (matrix) of shape `n x m`, where `n = count v`, and `m = count w` (or `n` if `w` is omitted)."
   ([f v]
    (mapv
-     (fn [a] (mapv (partial f a)
-                   v))
-       v))
+     (fn [a]
+       (mapv (partial f a)
+             v))
+     v))
   ([f v w]
    (mapv
-     (fn [a] (mapv (partial f a)
-                   w))
-       v)))
+     (fn [a]
+       (mapv (partial f a)
+             w))
+     v)))
