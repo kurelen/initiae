@@ -9,18 +9,18 @@
 
 (deftest test-ngram-fn
   (are [x y] (= x y)
-    0.0 (m/ngram-sim "haus" "haus")
-    0.375 (m/ngram-sim "haus" "maus")
-    0.5 (m/ngram-sim "haus" "maut")
-    0.75 (m/ngram-sim "haus" "mas")))
+    0.0 (m/ngram-dist "haus" "haus")
+    0.375 (m/ngram-dist "haus" "maus")
+    0.5 (m/ngram-dist "haus" "maut")
+    0.75 (m/ngram-dist "haus" "mas")))
 
 
-(deftest test-ngram-sim-fn
+(deftest test-ngram-dist-fn
   (are [x y] (< (abs (- x y)) eps)
-    0.70 (m/ngram-sim "haus" "park" {:ngram-length 3})
-    0.72 (m/ngram-sim "haus" "park" {:ngram-length 4})
-    0.25 (m/ngram-sim "haus" "park" {:ngram-length 5})
-    0.25 (m/ngram-sim "haus" "park" {:ngram-length 6})))
+    0.70 (m/ngram-dist "haus" "park" {:ngram-length 3})
+    0.72 (m/ngram-dist "haus" "park" {:ngram-length 4})
+    0.25 (m/ngram-dist "haus" "park" {:ngram-length 5})
+    0.25 (m/ngram-dist "haus" "park" {:ngram-length 6})))
 
 
 (deftest test-cosine-dist

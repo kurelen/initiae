@@ -43,7 +43,7 @@
 
 
 (def named-fns
-  [["NGram similarity" metric/ngram-sim]
+  [["NGram distance" metric/ngram-dist]
    ["Longest Common Subsequence distance" metric/lcs-dist]
    ["Longest Common Subsequence similarity" metric/lcs-sim]
    ["Cosine distance" metric/cosine-dist]

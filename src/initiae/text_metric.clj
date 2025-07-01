@@ -14,7 +14,7 @@
       WeightedLevenshtein)))
 
 
-(defn ngram-sim
+(defn ngram-dist
   "Returns the N-gram distance between strings `s1` and `s2`. 
   Optionally accepts an integer `:ngram-length` via an options map specifying the N-Gram size."
   ([s1 s2]
