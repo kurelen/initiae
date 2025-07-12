@@ -1,5 +1,6 @@
 (ns initiae.text-metric-test
   (:require
+    [clojure.string :refer [lower-case]]
     [clojure.test :refer [deftest are]]
     [initiae.text-metric :as m]))
 
@@ -98,3 +99,17 @@
     "haus" "maus"
     "haus" "maut"
     "haus" "mas"))
+
+
+(deftest test-weighted-levenshtein
+  (let [dist-fn (m/weighted-levenshtein-dist-fn
+                  {:substitute
+                   (fn [a b]
+                     (if (= (lower-case a) (lower-case b))
+                       0.0
+                       1.0))})]
+    (are [x y z] (= (dist-fn x y) z)
+      "ABC" "abc" 0.0
+      "abc" "AbcD" 1.0
+      "abc" "ABC" 0.0
+      "AbcD" "abc" 1.0)))
