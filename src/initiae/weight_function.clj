@@ -18,7 +18,7 @@
   (fn [a b]
     (let [c (lower-case a)
           d (lower-case b)]
-      (double (or (if (= c d) 0.0 nil)
+      (double (or (and (= c d) 0.0)
                   (lookup [c d])
                   (lookup [d c])
                   1.0)))))
