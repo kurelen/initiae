@@ -16,13 +16,15 @@
 (defn substitute-definition
   [lookup]
   (fn [a b]
-    (or (lookup [a b])
-        (lookup [b a])
-        (if (= (lower-case a) (lower-case b))
-          0.0
-          1.0))))
+    (let [c (lower-case a)
+          d (lower-case b)]
+      (double (or (and (= c d) 0.0)
+                  (lookup [c d])
+                  (lookup [d c])
+                  1.0)))))
 
 
 (def generated-weight-fn
   {:substitute
-   (substitute-definition (load-weight-definition))})
+   (substitute-definition
+     (:substitute (load-weight-definition)))})
