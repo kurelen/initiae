@@ -12,8 +12,11 @@
 (defn normalize-columns
   "Normalize each column to sum to 1."
   [matrix]
-  (let [col-sums (m/sum matrix 0)]
-    (m/div matrix (m/max col-sums 1e-10)))) ; prevent division by zero
+  (let [n (m/row-count matrix)
+        col-sums (for [j (range (m/column-count matrix))]
+                   (reduce + (for [i (range n)]
+                               (m/mget matrix i j))))]
+    (m/div matrix (mapv #(max % 1e-10) col-sums)))) ; prevent division by zero
 
 (defn inflate
   "Apply inflation step: element-wise power followed by column normalization."
@@ -32,7 +35,14 @@
 (defn has-converged?
   "Check if matrix has converged by comparing with previous iteration."
   [matrix prev-matrix tolerance]
-  (< (m/distance matrix prev-matrix) tolerance))
+  (let [n (m/row-count matrix)
+        m-cols (m/column-count matrix)
+        diff-sum (reduce +
+                         (for [i (range n)
+                               j (range m-cols)]
+                           (Math/abs (- (m/mget matrix i j)
+                                        (m/mget prev-matrix i j)))))]
+    (< diff-sum tolerance)))
 
 
 (defn extract-clusters

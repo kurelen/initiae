@@ -6,6 +6,9 @@ run:
 clerk:
 	clojure -X:clerk
 
+clerk-serve:
+	clojure -M -e "(require '[nextjournal.clerk :as clerk]) (clerk/serve! {:browse? true}) (clerk/show! \"notebooks/clustering_analysis.clj\")"
+
 test:
 	clojure -M:test
 
