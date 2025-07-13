@@ -140,8 +140,8 @@
         options-summary
         ""
         "Available metrics:"
-        (str/join "\n" (for [[k [name _]] available-metrics]
-                         (str "  " (name k) " - " name)))]
+        (str/join "\n" (for [[k [metric-name _]] available-metrics]
+                         (str "  " (name k) " - " metric-name)))]
        (str/join \newline)))
 
 
@@ -186,7 +186,7 @@
                     (name (:metric options))
                     " (inflation=" (:inflation options) ")..."))
 
-      (let [result (cluster-initiae initiae 
+      (let [result (cluster-initiae initiae
                                     :metric (:metric options)
                                     :inflation (:inflation options)
                                     :max-iterations (:max-iterations options)
@@ -216,25 +216,3 @@
         (do (println "Unknown action")
             (System/exit 1))))))
 
-
-;; Development helpers
-
-(comment
-  ;; Quick test
-  (def test-initiae ["Ave maria gratia plena"
-                     "Ave maria gracia plena"
-                     "Pange lingua gloriosi"])
-  
-  (def result (cluster-initiae test-initiae))
-  (print-clustering-results result)
-  
-  ;; Full analysis
-  (run-analysis {:metric :weighted-lev-sim
-                 :inflation 2.0
-                 :verbose true})
-  
-  ;; Compare different metrics
-  (doseq [metric [:levenshtein-sim :weighted-lev-sim :jaro-winkler-sim]]
-    (println (str "\n=== " (name metric) " ==="))
-    (let [result (cluster-initiae test-initiae :metric metric)]
-      (mcl/print-clusters (:labeled-clusters result)))))

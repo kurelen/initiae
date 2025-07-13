@@ -3,6 +3,13 @@
     [clojure.core.matrix :as m]))
 
 
+;; Set vectorz as the default implementation for better performance
+(binding [*warn-on-reflection* false]
+  (with-out-str
+    ;; Set vectorz as the default implementation for better performance
+    (m/set-current-implementation :vectorz)))
+
+
 (defn symmetric
   "Generates an `n x n` symmetric matrix from a vector `v` and a symmetric binary function `f`.
   Each element A_ij of the resulting matrix is computed as (f v_i v_j), ensuring symmetry:
