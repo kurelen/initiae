@@ -1,8 +1,8 @@
 (ns initiae.core-test
   (:require
+    [clojure.core.matrix :as m]
     [clojure.set :refer [subset?]]
     [clojure.test :refer [deftest is testing]]
-    [clojure.core.matrix :as m]
     [initiae.core :as core]
     [initiae.text-metric :as metric]))
 
@@ -19,22 +19,23 @@
   (testing "All metrics are properly defined"
     (is (map? core/available-metrics))
     (is (< 10 (count core/available-metrics)))
-    
+
     ;; Check that each metric has name and function
     (doseq [[k [name fn]] core/available-metrics]
       (is (keyword? k))
       (is (string? name))
       (is (fn? fn)))))
 
+
 (deftest test-get-metric
   (testing "Valid metrics return functions"
     (let [metric-fn (core/get-metric :levenshtein-sim)]
       (is (fn? metric-fn))
       (is (number? (metric-fn "test" "test")))))
-  
+
   (testing "Invalid metric throws exception"
-    (is (thrown-with-msg? 
-          clojure.lang.ExceptionInfo 
+    (is (thrown-with-msg?
+          clojure.lang.ExceptionInfo
           #"Unknown metric"
           (core/get-metric :invalid-metric)))))
 
@@ -47,12 +48,12 @@
       (is (= (:initiae result) test-initiae))
       (is (m/matrix? (:matrix result)))
       (is (= (m/shape (:matrix result)) [4 4]))))
-  
+
   (testing "Matrix is symmetric for similarity metrics"
     (let [result (core/analyze-similarities test-initiae :levenshtein-sim)
           matrix (:matrix result)]
       (is (m/equals matrix (m/transpose matrix) 1e-10))))
-  
+
   (testing "Diagonal elements are 1.0 for similarity metrics"
     (let [result (core/analyze-similarities test-initiae :levenshtein-sim)
           matrix (:matrix result)]
@@ -71,15 +72,15 @@
       (is (contains? result :iterations))
       (is (contains? result :clusters))
       (is (contains? result :labeled-clusters))))
-  
+
   (testing "Custom parameters are respected"
-    (let [result (core/cluster-initiae test-initiae 
+    (let [result (core/cluster-initiae test-initiae
                                        :metric :jaro-winkler-sim
                                        :inflation 1.5)]
       (is (= (:metric result) :jaro-winkler-sim))
       (is (boolean? (:converged result)))
       (is (pos-int? (:iterations result)))))
-  
+
   (testing "Labeled clusters contain original strings"
     (let [result (core/cluster-initiae test-initiae)
           all-clustered (apply concat (:labeled-clusters result))]
@@ -92,30 +93,34 @@
       (is (contains? result :exit-message))
       (is (:ok? result))
       (is (re-find #"Medieval Incipit Clustering Tool" (:exit-message result))))))
-  
-  (testing "Valid arguments return options"
-    (let [result (core/validate-args ["--metric" "levenshtein-sim" "--inflation" "1.5"])]
-      (is (= (:action result) :run))
-      (is (= (get-in result [:options :metric]) :levenshtein-sim))
-      (is (= (get-in result [:options :inflation]) 1.5))))
-  
-  (testing "Invalid metric returns error"
-    (let [result (core/validate-args ["--metric" "invalid-metric"])]
-      (is (contains? result :exit-message))
-      (is (false? (:ok? result)))))
-  
-  (testing "Invalid inflation value returns error"
-    (let [result (core/validate-args ["--inflation" "not-a-number"])]
-      (is (contains? result :exit-message))
-      (is (false? (:ok? result)))))
-  
-  (testing "Default values are set correctly"
-    (let [result (core/validate-args [])]
-      (is (= (:action result) :run))
-      (is (= (get-in result [:options :metric]) :weighted-lev-sim))
-      (is (= (get-in result [:options :inflation]) 2.0))
-      (is (= (get-in result [:options :tolerance]) 1e-6))
-      (is (= (get-in result [:options :max-iterations]) 100))))
+
+
+(testing "Valid arguments return options"
+  (let [result (core/validate-args ["--metric" "levenshtein-sim" "--inflation" "1.5"])]
+    (is (= (:action result) :run))
+    (is (= (get-in result [:options :metric]) :levenshtein-sim))
+    (is (= (get-in result [:options :inflation]) 1.5))))
+
+
+(testing "Invalid metric returns error"
+  (let [result (core/validate-args ["--metric" "invalid-metric"])]
+    (is (contains? result :exit-message))
+    (is (false? (:ok? result)))))
+
+
+(testing "Invalid inflation value returns error"
+  (let [result (core/validate-args ["--inflation" "not-a-number"])]
+    (is (contains? result :exit-message))
+    (is (false? (:ok? result)))))
+
+
+(testing "Default values are set correctly"
+  (let [result (core/validate-args [])]
+    (is (= (:action result) :run))
+    (is (= (get-in result [:options :metric]) :weighted-lev-sim))
+    (is (= (get-in result [:options :inflation]) 2.0))
+    (is (= (get-in result [:options :tolerance]) 1e-6))
+    (is (= (get-in result [:options :max-iterations]) 100))))
 
 
 (deftest test-metric-functions-work
@@ -126,9 +131,9 @@
               result (metric-fn "test" "test")]
           (is (number? result))
           (is (not (Double/isNaN result)))))))
-  
+
   (testing "Similarity metrics return higher values for identical strings"
-    (let [sim-metrics [:levenshtein-sim :jaro-winkler-sim :cosine-sim 
+    (let [sim-metrics [:levenshtein-sim :jaro-winkler-sim :cosine-sim
                        :jaccard-sim :lcs-sim :ngram-sim :weighted-lev-sim]]
       (doseq [metric sim-metrics]
         (let [metric-fn (core/get-metric metric)
@@ -136,9 +141,9 @@
               different-score (metric-fn "test" "completely different")]
           (is (>= identical-score different-score)
               (str "Metric " metric " should give higher scores for identical strings"))))))
-  
+
   (testing "Distance metrics return lower values for identical strings"
-    (let [dist-metrics [:levenshtein-dist :jaro-winkler-dist :cosine-dist 
+    (let [dist-metrics [:levenshtein-dist :jaro-winkler-dist :cosine-dist
                         :jaccard-dist :lcs-dist :damerau-dist :weighted-lev-dist]]
       (doseq [metric dist-metrics]
         (let [metric-fn (core/get-metric metric)
@@ -153,10 +158,10 @@
     (let [result (core/cluster-initiae ["single item"])]
       (is (= (count (:labeled-clusters result)) 1))
       (is (= (first (:labeled-clusters result)) ["single item"]))))
-  
+
   (testing "Empty initiae list"
     (is (nil? (core/cluster-initiae []))))
-  
+
   (testing "Identical initiae cluster together"
     (let [identical-initiae ["same text" "same text" "same text"]
           result (core/cluster-initiae identical-initiae)]
