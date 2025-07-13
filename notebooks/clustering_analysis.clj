@@ -7,6 +7,7 @@
             [initiae.mcl :as mcl]
             [clojure.core.matrix :as m]))
 
+
 ;; # Medieval Incipit Clustering Analysis
 ;; 
 ;; This notebook demonstrates clustering of medieval manuscript incipits using
@@ -29,10 +30,12 @@
    "Te deum laudamus"
    "Te deum laudamus te"])
 
+
 ^{:nextjournal.clerk/visibility {:result :hide}}
 (clerk/table
   {:head ["Index" "Incipit"]
    :rows (map-indexed vector sample-incipits)})
+
 
 ;; ## Character Substitution Costs
 ;; 
@@ -50,6 +53,7 @@
     ;; ... (showing subset for brevity)
     }})
 
+
 ;; ## Similarity Matrix Generation
 ;; 
 ;; We create a similarity matrix using weighted Levenshtein distance:
@@ -58,29 +62,35 @@
 (def similarity-fn
   (metric/weighted-levenshtein-sim-fn costs/paleographic-costs))
 
+
 (def similarity-matrix
   (matrix/symmetric similarity-fn sample-incipits))
+
 
 ;; ### Similarity Matrix Visualization
 
 ^{:nextjournal.clerk/visibility {:code :hide}}
-(defn format-matrix [matrix]
+(defn format-matrix
+  [matrix]
   (let [n (m/row-count matrix)]
     {:head (concat [""] (map str (range n)))
      :rows (for [i (range n)]
-             (concat [i] 
+             (concat [i]
                      (for [j (range n)]
                        (format "%.3f" (m/mget matrix i j)))))}))
 
+
 ^{:nextjournal.clerk/visibility {:result :show}}
 (clerk/table (format-matrix similarity-matrix))
+
 
 ;; ## Clustering Analysis
 ;; 
 ;; We apply Markov Clustering with different inflation parameters:
 
 ^{:nextjournal.clerk/visibility {:code :show}}
-(defn analyze-clustering [incipits inflation]
+(defn analyze-clustering
+  [incipits inflation]
   (let [result (mcl/cluster-with-labels incipits similarity-matrix :inflation inflation)]
     {:inflation inflation
      :converged (:converged result)
@@ -89,11 +99,13 @@
      :cluster-sizes (mapv count (:clusters result))
      :labeled-clusters (:labeled-clusters result)}))
 
+
 ;; ### Results with Different Inflation Parameters
 
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (def clustering-results
   (mapv #(analyze-clustering sample-incipits %) [1.5 2.0 2.5 3.0 3.5]))
+
 
 ^{:nextjournal.clerk/visibility {:result :show}}
 (clerk/table
@@ -105,6 +117,7 @@
             (:num-clusters result)
             (clojure.string/join ", " (:cluster-sizes result))])})
 
+
 ;; ## Detailed Clustering Results
 ;; 
 ;; Let's examine the clustering with inflation = 2.0 in detail:
@@ -112,30 +125,36 @@
 ^{:nextjournal.clerk/visibility {:code :show}}
 (def detailed-result (analyze-clustering sample-incipits 2.0))
 
+
 ^{:nextjournal.clerk/visibility {:code :hide}}
-(defn format-clusters [labeled-clusters]
+(defn format-clusters
+  [labeled-clusters]
   (for [[i cluster] (map-indexed vector labeled-clusters)]
     {:cluster (str "Cluster " (inc i))
      :size (count cluster)
      :members (clojure.string/join "; " cluster)}))
 
+
 ^{:nextjournal.clerk/visibility {:result :show}}
 (clerk/table
   {:head ["Cluster" "Size" "Members"]
-   :rows (map (juxt :cluster :size :members) 
+   :rows (map (juxt :cluster :size :members)
               (format-clusters (:labeled-clusters detailed-result)))})
+
 
 ;; ## Similarity Heatmap
 ;; 
 ;; Visual representation of the similarity matrix:
 
 ^{:nextjournal.clerk/visibility {:code :hide}}
-(defn similarity-heatmap [matrix labels]
+(defn similarity-heatmap
+  [matrix labels]
   (let [n (m/row-count matrix)]
     {:data (for [i (range n)
                  j (range n)]
              {:x j :y i :similarity (m/mget matrix i j)})
      :labels labels}))
+
 
 ^{:nextjournal.clerk/visibility {:result :show}}
 (let [heatmap-data (similarity-heatmap similarity-matrix sample-incipits)]
@@ -144,7 +163,7 @@
      :mark {:type "rect" :stroke "white" :strokeWidth 1}
      :encoding {:x {:field "x" :type "ordinal" :title "Incipit Index"}
                 :y {:field "y" :type "ordinal" :title "Incipit Index"}
-                :color {:field "similarity" 
+                :color {:field "similarity"
                         :type "quantitative"
                         :scale {:scheme "viridis"}
                         :legend {:title "Similarity"}}
@@ -152,17 +171,20 @@
      :width 400
      :height 400}))
 
+
 ;; ## Cluster Stability Analysis
 ;; 
 ;; How do cluster assignments change with different inflation parameters?
 
 ^{:nextjournal.clerk/visibility {:code :hide}}
-(defn stability-analysis [results]
+(defn stability-analysis
+  [results]
   (let [inflations (mapv :inflation results)
         cluster-counts (mapv :num-clusters results)]
     {:inflation-vs-clusters
      {:data (mapv (fn [inf clusters] {:inflation inf :clusters clusters})
                   inflations cluster-counts)}}))
+
 
 ^{:nextjournal.clerk/visibility {:result :show}}
 (let [stability (stability-analysis clustering-results)]
@@ -173,6 +195,7 @@
                 :y {:field "clusters" :type "quantitative" :title "Number of Clusters"}}
      :width 400
      :height 300}))
+
 
 ;; ## Conclusions
 ;; 
