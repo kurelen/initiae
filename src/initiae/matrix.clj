@@ -21,12 +21,13 @@
   Returns:
   - A core.matrix matrix of size `n x n`, symmetric across the diagonal."
   [f v]
-  (let [n (count v)]
+  (let [n (count v)
+        mfn (memoize f)]
     (m/compute-matrix [n n]
                       (fn [i j]
                         (if (<= i j)
-                          (f (nth v i) (nth v j))
-                          (f (nth v j) (nth v i)))))))
+                          (mfn (nth v i) (nth v j))
+                          (mfn (nth v j) (nth v i)))))))
 
 
 (defn pairwise

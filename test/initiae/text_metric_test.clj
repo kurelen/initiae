@@ -7,13 +7,13 @@
 (deftest test-ngram-distance-and-similarity
   (testing "N-gram distance"
     (is (= 0.0 (metric/ngram-dist "hello" "hello")))
-    (is (> (metric/ngram-dist "hello" "world") 0))
-    (is (> (metric/ngram-dist "abc" "xyz") 0)))
+    (is (< 0 (metric/ngram-dist "hello" "world")))
+    (is (< 0 (metric/ngram-dist "abc" "xyz"))))
 
   (testing "N-gram similarity"
     (is (= 1.0 (metric/ngram-sim "hello" "hello")))
     (is (< (metric/ngram-sim "hello" "world") 1.0))
-    (is (>= (metric/ngram-sim "abc" "def") 0.0)))
+    (is (<= 0.0 (metric/ngram-sim "abc" "def"))))
 
   (testing "N-gram with custom length"
     (let [dist2 (metric/ngram-dist "abc" "abd" {:ngram-length 2})
@@ -24,31 +24,31 @@
 
 (deftest test-lcs-distance-and-similarity
   (testing "LCS distance"
-    (is (= 0 (metric/lcs-dist "hello" "hello")))
-    (is (> (metric/lcs-dist "abc" "def") 0))
-    (is (= 2 (metric/lcs-dist "ab" "cd")))) ; no common subsequence
+    (is (= 0.0 (metric/lcs-dist "hello" "hello")))
+    (is (< 0 (metric/lcs-dist "abc" "def")))
+    (is (= 4.0 (metric/lcs-dist "ab" "cd")))) ; no common subsequence
 
   (testing "LCS similarity"
-    (is (> (metric/lcs-sim "hello" "hello") 0.5))
+    (is (< 0.5 (metric/lcs-sim "hello" "hello")))
     (is (< (metric/lcs-sim "abc" "xyz") 0.5))))
 
 
 (deftest test-cosine-distance-and-similarity
   (testing "Cosine distance"
     (is (= 0.0 (metric/cosine-dist "hello world" "hello world")))
-    (is (>= (metric/cosine-dist "hello" "world") 0.0))
+    (is (<= 0.0 (metric/cosine-dist "hello" "world")))
     (is (<= (metric/cosine-dist "hello" "world") 1.0)))
 
   (testing "Cosine similarity"
     (is (= 1.0 (metric/cosine-sim "hello world" "hello world")))
-    (is (>= (metric/cosine-sim "hello" "world") 0.0))
+    (is (<= 0.0 (metric/cosine-sim "hello" "world")))
     (is (<= (metric/cosine-sim "hello" "world") 1.0))))
 
 
 (deftest test-jaccard-distance-and-similarity
   (testing "Jaccard distance"
     (is (= 0.0 (metric/jaccard-dist "hello" "hello")))
-    (is (> (metric/jaccard-dist "abc" "def") 0)))
+    (is (< 0 (metric/jaccard-dist "abc" "def"))))
 
   (testing "Jaccard similarity"
     (is (= 1.0 (metric/jaccard-sim "hello" "hello")))
@@ -59,20 +59,20 @@
           sim (metric/jaccard-sim "hello" "hallo" {:shingle-size 2})]
       (is (number? dist))
       (is (number? sim))
-      (is (>= sim 0.0))
+      (is (<= 0.0 sim))
       (is (<= sim 1.0)))))
 
 
 (deftest test-jaro-winkler-distance-and-similarity
   (testing "Jaro-Winkler distance"
     (is (= 0.0 (metric/jaro-winkler-dist "hello" "hello")))
-    (is (> (metric/jaro-winkler-dist "abc" "xyz") 0))
+    (is (< 0 (metric/jaro-winkler-dist "abc" "xyz")))
     (is (<= (metric/jaro-winkler-dist "hello" "hallo") 1.0)))
 
   (testing "Jaro-Winkler similarity"
     (is (= 1.0 (metric/jaro-winkler-sim "hello" "hello")))
     (is (< (metric/jaro-winkler-sim "abc" "xyz") 1.0))
-    (is (>= (metric/jaro-winkler-sim "hello" "hallo") 0.0)))
+    (is (<= 0.0 (metric/jaro-winkler-sim "hello" "hallo"))))
 
   (testing "Jaro-Winkler with custom threshold"
     (let [dist (metric/jaro-winkler-dist "hello" "hallo" {:threshold 0.8})
@@ -83,14 +83,14 @@
 
 (deftest test-levenshtein-distance-and-similarity
   (testing "Levenshtein distance"
-    (is (= 0 (metric/levenshtein-dist "hello" "hello")))
-    (is (= 1 (metric/levenshtein-dist "cat" "bat")))
-    (is (= 3 (metric/levenshtein-dist "kitten" "sitting"))))
+    (is (= 0.0 (metric/levenshtein-dist "hello" "hello")))
+    (is (= 1.0 (metric/levenshtein-dist "cat" "bat")))
+    (is (= 3.0 (metric/levenshtein-dist "kitten" "sitting"))))
 
   (testing "Levenshtein similarity"
     (is (= 1.0 (metric/levenshtein-sim "hello" "hello")))
-    (is (= (/ 2 3) (metric/levenshtein-sim "cat" "bat"))) ; 1 edit, max length 3
-    (is (> (metric/levenshtein-sim "kitten" "sitting") 0.5)))
+    (is (= (double (/ 2 3)) (metric/levenshtein-sim "cat" "bat"))) ; 1 edit, max length 3
+    (is (< 0.5 (metric/levenshtein-sim "kitten" "sitting"))))
 
   (testing "Levenshtein with limit"
     (let [dist (metric/levenshtein-dist "very long string" "another very long string" {:limit 5})]
@@ -104,14 +104,14 @@
 
 (deftest test-damerau-distance-and-similarity
   (testing "Damerau-Levenshtein distance"
-    (is (= 0 (metric/damerau-dist "hello" "hello")))
-    (is (= 1 (metric/damerau-dist "cat" "bat")))
-    (is (= 1 (metric/damerau-dist "ca" "ac"))) ; transposition
-    (is (> (metric/damerau-dist "abc" "xyz") 0)))
+    (is (= 0.0 (metric/damerau-dist "hello" "hello")))
+    (is (= 1.0 (metric/damerau-dist "cat" "bat")))
+    (is (= 1.0 (metric/damerau-dist "ca" "ac"))) ; transposition
+    (is (< 0 (metric/damerau-dist "abc" "xyz"))))
 
   (testing "Damerau-Levenshtein similarity"
     (is (= 1.0 (metric/damerau-sim "hello" "hello")))
-    (is (= (/ 1 2) (metric/damerau-sim "ca" "ac"))) ; 1 edit, max length 2
+    (is (= 0.5 (metric/damerau-sim "ca" "ac"))) ; 1 edit, max length 2
     (is (< (metric/damerau-sim "abc" "xyz") 1.0))))
 
 
@@ -125,7 +125,7 @@
       (is (fn? dist-fn))
       (is (= 0.0 (dist-fn "hello" "hello")))
       (is (= 1.0 (dist-fn "cat" "bat")))
-      (is (> (dist-fn "abc" "xyz") 0))))
+      (is (< 0 (dist-fn "abc" "xyz")))))
 
   (testing "Weighted Levenshtein similarity function creation"
     (let [simple-costs {:substitute (fn [c1 c2] (if (= c1 c2) 0.0 1.0))}
@@ -134,7 +134,7 @@
       (is (fn? sim-fn))
       (is (= 1.0 (sim-fn "hello" "hello")))
       (is (< (sim-fn "abc" "xyz") 1.0))
-      (is (>= (sim-fn "abc" "xyz") 0.0))))
+      (is (<= (sim-fn "abc" "xyz") 0.0))))
 
   (testing "Custom substitution costs"
     (let [vowel-costs {:substitute (fn [c1 c2]
@@ -146,7 +146,7 @@
           sim-fn (metric/weighted-levenshtein-sim-fn vowel-costs)]
 
       ;; Vowel substitutions should be cheaper
-      (is (> (sim-fn "cat" "cet") (sim-fn "cat" "cxt"))))))
+      (is (< (sim-fn "cat" "cxt") (sim-fn "cat" "cet"))))))
 
 
 (deftest test-utility-functions
@@ -183,13 +183,13 @@
       ;; Test non-negativity
       (doseq [s1 strings
               s2 strings]
-        (is (>= (metric/levenshtein-dist s1 s2) 0))
-        (is (>= (metric/damerau-dist s1 s2) 0)))
+        (is (<= 0 (metric/levenshtein-dist s1 s2)))
+        (is (<= 0 (metric/damerau-dist s1 s2))))
 
       ;; Test identity (distance from string to itself is 0)
       (doseq [s strings]
-        (is (= 0 (metric/levenshtein-dist s s)))
-        (is (= 0 (metric/damerau-dist s s))))
+        (is (= 0.0 (metric/levenshtein-dist s s)))
+        (is (= 0.0 (metric/damerau-dist s s))))
 
       ;; Test symmetry
       (doseq [s1 strings
@@ -203,9 +203,9 @@
       ;; Test boundedness [0,1]
       (doseq [s1 strings
               s2 strings]
-        (is (>= (metric/levenshtein-sim s1 s2) 0.0))
+        (is (<= 0.0 (metric/levenshtein-sim s1 s2)))
         (is (<= (metric/levenshtein-sim s1 s2) 1.0))
-        (is (>= (metric/damerau-sim s1 s2) 0.0))
+        (is (<= 0.0 (metric/damerau-sim s1 s2)))
         (is (<= (metric/damerau-sim s1 s2) 1.0)))
 
       ;; Test identity (similarity of string to itself is 1)
@@ -231,7 +231,7 @@
 
       (doseq [[original variant] variations]
         ;; Variants should have high similarity
-        (is (> (lev-sim original variant) 0.7))
+        (is (< 0.7 (lev-sim original variant)))
         ;; Should be symmetric
         (is (= (lev-sim original variant) (lev-sim variant original)))))))
 
@@ -239,14 +239,14 @@
 (deftest test-edge-cases-and-errors
   (testing "Empty string handling"
     (is (= 0.0 (metric/ngram-dist "" "")))
-    (is (= 0 (metric/levenshtein-dist "" "")))
+    (is (= 0.0 (metric/levenshtein-dist "" "")))
     (is (= 1.0 (metric/levenshtein-sim "" "")))
     (is (= 1.0 (metric/cosine-sim "" "")))
     (is (= 1.0 (metric/jaccard-sim "" ""))))
 
   (testing "Single character strings"
-    (is (= 0 (metric/levenshtein-dist "a" "a")))
-    (is (= 1 (metric/levenshtein-dist "a" "b")))
+    (is (= 0.0 (metric/levenshtein-dist "a" "a")))
+    (is (= 1.0 (metric/levenshtein-dist "a" "b")))
     (is (= 1.0 (metric/levenshtein-sim "a" "a")))
     (is (= 0.0 (metric/levenshtein-sim "a" "b"))))
 

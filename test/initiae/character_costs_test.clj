@@ -14,14 +14,14 @@
       ;; Test some known character pairs
       (let [sub-costs (:substitute loaded-costs)]
         (is (= 0.3 (get sub-costs ["a" "o"])))
-        (is (= 0.0 (get sub-costs ["b" "p"])))
-        (is (= 0.0 (get sub-costs ["f" "v"])))))))
+        (is (= 0 (get sub-costs ["b" "p"])))
+        (is (= 0 (get sub-costs ["f" "v"])))))))
 
 
 (deftest test-create-substitution-cost-fn
   (testing "Creating substitution cost function"
     (let [test-costs {["a" "o"] 0.3
-                      ["b" "p"] 0.0
+                      ["b" "p"] 0
                       ["x" "y"] 0.5}
           cost-fn (costs/create-substitution-cost-fn test-costs)]
 
@@ -41,6 +41,8 @@
       (is (= 1.0 (cost-fn "q" "w")))
 
       ;; Test case insensitivity
+      (is (= 0.0 (cost-fn "a" "A")))
+      (is (= 0.0 (cost-fn "z" "Z")))
       (is (= 0.3 (cost-fn "A" "O")))
       (is (= 0.3 (cost-fn "A" "o")))
       (is (= 0.3 (cost-fn "a" "O"))))))

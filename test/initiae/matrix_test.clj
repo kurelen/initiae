@@ -16,9 +16,9 @@
       (is (= 3 (m/column-count result)))
 
       ;; Check diagonal (should be 0 for distance function)
-      (is (= 0 (m/mget result 0 0)))
-      (is (= 0 (m/mget result 1 1)))
-      (is (= 0 (m/mget result 2 2)))
+      (is (= 0.0 (m/mget result 0 0)))
+      (is (= 0.0 (m/mget result 1 1)))
+      (is (= 0.0 (m/mget result 2 2)))
 
       ;; Check symmetry
       (is (= (m/mget result 0 1) (m/mget result 1 0)))
@@ -26,20 +26,20 @@
       (is (= (m/mget result 1 2) (m/mget result 2 1)))
 
       ;; Check off-diagonal values
-      (is (= 1 (m/mget result 0 1)))
-      (is (= 1 (m/mget result 1 2)))))
+      (is (= 1.0 (m/mget result 0 1)))
+      (is (= 1.0 (m/mget result 1 2)))))
 
   (testing "Symmetric matrix with custom function"
     (let [v [1 2 3]
           sum-fn (fn [x y] (+ x y))
           result (matrix/symmetric sum-fn v)]
 
-      (is (= 2 (m/mget result 0 0))) ; 1+1
-      (is (= 3 (m/mget result 0 1))) ; 1+2
-      (is (= 4 (m/mget result 0 2))) ; 1+3
-      (is (= 4 (m/mget result 1 1))) ; 2+2
-      (is (= 5 (m/mget result 1 2))) ; 2+3
-      (is (= 6 (m/mget result 2 2))) ; 3+3
+      (is (= 2.0 (m/mget result 0 0))) ; 1+1
+      (is (= 3.0 (m/mget result 0 1))) ; 1+2
+      (is (= 4.0 (m/mget result 0 2))) ; 1+3
+      (is (= 4.0 (m/mget result 1 1))) ; 2+2
+      (is (= 5.0 (m/mget result 1 2))) ; 2+3
+      (is (= 6.0 (m/mget result 2 2))) ; 3+3
 
       ;; Verify symmetry
       (is (= (m/mget result 0 1) (m/mget result 1 0)))
@@ -49,16 +49,16 @@
 
 (deftest test-pairwise-matrix
   (testing "Pairwise matrix with single vector"
-    (let [v ["x" "y"]
-          concat-fn (fn [x y] (str x y))
+    (let [v [1 2]
+          concat-fn (fn [x y] (+ x y))
           result (matrix/pairwise concat-fn v)]
 
       (is (= 2 (m/row-count result)))
       (is (= 2 (m/column-count result)))
-      (is (= "xx" (m/mget result 0 0)))
-      (is (= "xy" (m/mget result 0 1)))
-      (is (= "yx" (m/mget result 1 0)))
-      (is (= "yy" (m/mget result 1 1)))))
+      (is (= 2.0 (m/mget result 0 0)))
+      (is (= 3.0 (m/mget result 0 1)))
+      (is (= 3.0 (m/mget result 1 0)))
+      (is (= 4.0 (m/mget result 1 1)))))
 
   (testing "Pairwise matrix with two vectors"
     (let [v1 [1 2]
@@ -68,12 +68,12 @@
 
       (is (= 2 (m/row-count result)))
       (is (= 3 (m/column-count result)))
-      (is (= 3 (m/mget result 0 0)))  ; 1*3
-      (is (= 4 (m/mget result 0 1)))  ; 1*4
-      (is (= 5 (m/mget result 0 2)))  ; 1*5
-      (is (= 6 (m/mget result 1 0)))  ; 2*3
-      (is (= 8 (m/mget result 1 1)))  ; 2*4
-      (is (= 10 (m/mget result 1 2)))))) ; 2*5
+      (is (= 3.0 (m/mget result 0 0)))  ; 1*3
+      (is (= 4.0 (m/mget result 0 1)))  ; 1*4
+      (is (= 5.0 (m/mget result 0 2)))  ; 1*5
+      (is (= 6.0 (m/mget result 1 0)))  ; 2*3
+      (is (= 8.0 (m/mget result 1 1)))  ; 2*4
+      (is (= 10.0 (m/mget result 1 2)))))) ; 2*5
 
 (deftest test-matrix-stats
   (testing "Matrix statistics"
@@ -83,8 +83,8 @@
           stats (matrix/matrix-stats matrix)]
 
       (is (= [3 3] (:shape stats)))
-      (is (= 1 (:min stats)))
-      (is (= 9 (:max stats)))
+      (is (= 1.0 (:min stats)))
+      (is (= 9.0 (:max stats)))
       (is (= 5.0 (:mean stats)))
       (is (false? (:symmetric? stats)))))
 
@@ -144,9 +144,9 @@
           labels ["A" "B"]]
 
       ;; Just test that it doesn't throw an exception
-      (is (nil? (with-out-str (matrix/print-matrix matrix))))
-      (is (nil? (with-out-str (matrix/print-matrix matrix {:labels labels}))))
-      (is (nil? (with-out-str (matrix/print-matrix matrix {:precision 2})))))))
+      (is (not (nil? (with-out-str (matrix/print-matrix matrix)))))
+      (is (not (nil? (with-out-str (matrix/print-matrix matrix {:labels labels})))))
+      (is (not (nil? (with-out-str (matrix/print-matrix matrix {:precision 2}))))))))
 
 
 (deftest test-matrix-conversion
@@ -155,7 +155,7 @@
                             [3 4]])
           nested-vec (matrix/matrix->nested-vec matrix)]
 
-      (is (= [[1 2] [3 4]] nested-vec))
+      (is (= [[1.0 2.0] [3.0 4.0]] nested-vec))
       (is (vector? nested-vec))
       (is (vector? (first nested-vec))))))
 
@@ -164,12 +164,12 @@
   (testing "Empty and single-element cases"
     ;; Single element vector
     (let [v ["single"]
-          result (matrix/symmetric (fn [x y] 1) v)]
+          result (matrix/symmetric (fn [_ _] 1) v)]
       (is (= 1 (m/row-count result)))
       (is (= 1 (m/column-count result))))
 
     ;; Empty vector should handle gracefully
     (let [v []
-          result (matrix/symmetric (fn [x y] 1) v)]
+          result (matrix/symmetric (fn [_ _] 1) v)]
       (is (= 0 (m/row-count result)))
       (is (= 0 (m/column-count result))))))

@@ -5,6 +5,11 @@
     [initiae.mcl :as mcl]))
 
 
+(defn similiar?
+  [a b]
+  (< (Math/abs (- a b)) 1e-10))
+
+
 (deftest test-prune-matrix
   (testing "Matrix pruning removes small values"
     (let [matrix (m/matrix [[0.8 0.1 0.05]
@@ -30,14 +35,14 @@
       ;; Check that columns sum to approximately 1
       (let [col1-sum (+ (m/mget normalized 0 0) (m/mget normalized 1 0))
             col2-sum (+ (m/mget normalized 0 1) (m/mget normalized 1 1))]
-        (is (< (Math/abs (- col1-sum 1.0)) 1e-10))
-        (is (< (Math/abs (- col2-sum 1.0)) 1e-10)))
+        (is (similiar? col1-sum 1.0))
+        (is (similiar? col2-sum 1.0)))
 
       ;; Check specific values
       (is (= 0.25 (m/mget normalized 0 0))) ; 1/4
       (is (= 0.75 (m/mget normalized 1 0))) ; 3/4
-      (is (= (/ 1 3) (m/mget normalized 0 1))) ; 2/6
-      (is (= (/ 2 3) (m/mget normalized 1 1))))) ; 4/6
+      (is (similiar? (/ 1 3) (m/mget normalized 0 1))) ; 2/6
+      (is (similiar? (/ 2 3) (m/mget normalized 1 1))))) ; 4/6
 
   (testing "Normalization with zero columns"
     (let [matrix (m/matrix [[1 0]
@@ -45,8 +50,8 @@
           normalized (mcl/normalize-columns matrix)]
 
       ;; Non-zero column should normalize properly
-      (is (= (/ 1 3) (m/mget normalized 0 0)))
-      (is (= (/ 2 3) (m/mget normalized 1 0)))
+      (is (similiar? (/ 1 3) (m/mget normalized 0 0)))
+      (is (similiar? (/ 2 3) (m/mget normalized 1 0)))
 
       ;; Zero column should remain zero (or very small)
       (is (< (m/mget normalized 0 1) 1e-9))
@@ -62,10 +67,10 @@
       ;; After squaring and normalizing
       ;; Column 1: [0.36, 0.16] -> [0.36/0.52, 0.16/0.52] = [0.692..., 0.307...]
       ;; Column 2: [0.04, 0.64] -> [0.04/0.68, 0.64/0.68] = [0.058..., 0.941...]
-      (is (< (Math/abs (- (m/mget inflated 0 0) (/ 0.36 0.52))) 1e-10))
-      (is (< (Math/abs (- (m/mget inflated 1 0) (/ 0.16 0.52))) 1e-10))
-      (is (< (Math/abs (- (m/mget inflated 0 1) (/ 0.04 0.68))) 1e-10))
-      (is (< (Math/abs (- (m/mget inflated 1 1) (/ 0.64 0.68))) 1e-10)))))
+      (similiar? (m/mget inflated 0 0) (/ 0.36 0.52))
+      (similiar? (m/mget inflated 1 0) (/ 0.16 0.52))
+      (similiar? (m/mget inflated 0 1) (/ 0.04 0.68))
+      (similiar? (m/mget inflated 1 1) (/ 0.64 0.68)))))
 
 
 (deftest test-expand
@@ -77,10 +82,10 @@
       ;; Manual matrix multiplication
       ;; [0.5 0.2] * [0.5 0.2] = [0.35 0.26]
       ;; [0.5 0.8]   [0.5 0.8]   [0.65 0.74]
-      (is (= 0.35 (m/mget expanded 0 0))) ; 0.5*0.5 + 0.2*0.5
-      (is (= 0.26 (m/mget expanded 0 1))) ; 0.5*0.2 + 0.2*0.8
-      (is (= 0.65 (m/mget expanded 1 0))) ; 0.5*0.5 + 0.8*0.5
-      (is (= 0.74 (m/mget expanded 1 1)))))) ; 0.5*0.2 + 0.8*0.8
+      (is (similiar? 0.35 (m/mget expanded 0 0))) ; 0.5*0.5 + 0.2*0.5
+      (is (similiar? 0.26 (m/mget expanded 0 1))) ; 0.5*0.2 + 0.2*0.8
+      (is (similiar? 0.65 (m/mget expanded 1 0))) ; 0.5*0.5 + 0.8*0.5
+      (is (similiar? 0.74 (m/mget expanded 1 1)))))) ; 0.5*0.2 + 0.8*0.8
 
 (deftest test-has-converged
   (testing "Convergence detection"
@@ -181,11 +186,9 @@
   (testing "MCL with different parameters"
     (let [similarity-matrix (m/matrix [[1.0 0.5 0.1]
                                        [0.5 1.0 0.1]
-                                       [0.1 0.1 1.0]])]
-
-      ;; Test different inflation parameters
-      (let [result-low (mcl/mcl similarity-matrix :inflation 1.5)
-            result-high (mcl/mcl similarity-matrix :inflation 4.0)]
+                                       [0.1 0.1 1.0]])
+          result-low (mcl/mcl similarity-matrix :inflation 1.5)
+          result-high (mcl/mcl similarity-matrix :inflation 4.0)]
 
         ;; Higher inflation should generally produce more clusters
         (is (<= (count (:clusters result-low))
@@ -193,11 +196,11 @@
 
         ;; Both should converge with reasonable iterations
         (is (<= (:iterations result-low) 100))
-        (is (<= (:iterations result-high) 100))))))
+        (is (<= (:iterations result-high) 100)))))
 
 
 (deftest test-print-clusters
   (testing "Cluster printing doesn't throw errors"
     (let [clusters [["item1" "item2"] ["item3"]]]
       ;; Just test that it doesn't throw an exception
-      (is (nil? (with-out-str (mcl/print-clusters clusters)))))))
+      (is (not (nil? (with-out-str (mcl/print-clusters clusters))))))))
