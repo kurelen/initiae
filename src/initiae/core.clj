@@ -1,7 +1,6 @@
 (ns initiae.core
   (:gen-class)
   (:require
-    [clojure.edn :as edn]
     [clojure.java.io :as io]
     [clojure.pprint :refer [pprint]]
     [clojure.string :as str]

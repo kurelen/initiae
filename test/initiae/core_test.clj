@@ -8,4 +8,3 @@
   (let [data (core/load-initiae)]
     (is (vector? data))
     (is (not (= 0 (count data))))))
-
