@@ -63,7 +63,7 @@
   (let [v (load-fixture-list)]
     (-> (metric/weighted-levenshtein-sim-fn generated-weight-fn)
         (matrix/symmetric v)
-        ; (print-matrix v)
+        ;; (print-matrix v)
         (m/matrix)
         (c/run-mcl 4.0 100 1e-5)
         (c/extract-clusters)
