@@ -190,13 +190,13 @@
           result-low (mcl/mcl similarity-matrix :inflation 1.5)
           result-high (mcl/mcl similarity-matrix :inflation 4.0)]
 
-        ;; Higher inflation should generally produce more clusters
-        (is (<= (count (:clusters result-low))
-                (count (:clusters result-high))))
+      ;; Higher inflation should generally produce more clusters
+      (is (<= (count (:clusters result-low))
+              (count (:clusters result-high))))
 
-        ;; Both should converge with reasonable iterations
-        (is (<= (:iterations result-low) 100))
-        (is (<= (:iterations result-high) 100)))))
+      ;; Both should converge with reasonable iterations
+      (is (<= (:iterations result-low) 100))
+      (is (<= (:iterations result-high) 100)))))
 
 
 (deftest test-print-clusters
