@@ -6,10 +6,16 @@
 (m/set-current-implementation :vectorz)
 
 
-(defn normalize-columns
-  [matrix]
-  (let [col-sums (m/sum (m/transpose matrix))]
-    (m/div matrix (m/reshape col-sums [(count col-sums) 1]))))
+(defn normalize-columns [matrix]
+  (let [cols (m/columns matrix)
+        col-sums (map #(m/esum %) cols)]
+    (->> (map (fn [col sum]
+                (if (zero? sum)
+                  col
+                  (m/div col sum)))
+              cols col-sums)
+         m/matrix
+         m/transpose)))
 
 
 (defn inflate

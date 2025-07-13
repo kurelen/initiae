@@ -3,7 +3,10 @@
   (:require
     [clojure.edn :as edn]
     [clojure.java.io :as io]
+    [clojure.core.matrix :as m]
+    [clojure.pprint :refer [pprint]]
     [clojure.string :refer [join]]
+    [initiae.clustering :as c]
     [initiae.matrix :as matrix]
     [initiae.text-metric :as metric]
     [initiae.weight-function :refer [generated-weight-fn]]))
@@ -32,7 +35,7 @@
 
 
 (defn print-matrix
-  [v matrix]
+  [matrix v]
   (doseq [row (map #(str %1 "\t" (join "\t" %2)) v matrix)]
     (println row)))
 
@@ -54,8 +57,19 @@
    ["Weighted Levenshtein distance" (metric/weighted-levenshtein-dist-fn generated-weight-fn)]
    ["Weighted Levenshtein similarity" (metric/weighted-levenshtein-sim-fn generated-weight-fn)]])
 
-
 (defn -main
+  [& _]
+  (let [v (load-fixture-list)]
+    (-> (metric/weighted-levenshtein-sim-fn generated-weight-fn)
+        (matrix/symmetric (load-fixture-list))
+        ;(print-matrix v)
+        (m/matrix)
+        (c/run-mcl 4.0 100 1e-5)
+        (c/extract-clusters)
+        println)))
+
+
+(comment (defn -main
   [& _]
   ;;  (let [initiae (-> (load-fixture-edn)
   ;;                    (flatten-fixture))]
@@ -63,4 +77,4 @@
     (doseq [[s f] named-fns]
       (println s)
       (print-matrix initiae (matrix/symmetric f initiae))
-      (println))))
+      (pprint)))))
