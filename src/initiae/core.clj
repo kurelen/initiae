@@ -121,6 +121,9 @@
    ["-t" "--tolerance FLOAT" "Convergence tolerance"
     :default 1e-6
     :parse-fn #(Double/parseDouble %)]
+   ["-r" "--max-iterations INT" "Maximum iterations for MCL"
+    :default 100
+    :parse-fn #(Integer/parseInt %)]
    ["-o" "--output FILE" "Output file for results"]
    ["-v" "--verbose" "Verbose output"]
    ["-h" "--help" "Show help"]])
@@ -130,7 +133,8 @@
   [options-summary]
   (->> ["Medieval Incipit Clustering Tool"
         ""
-        "Usage: java -jar initiae.jar [options]"
+        "Usage: clj -M:run [options]"
+        "   or: java -jar initiae.jar [options]"
         ""
         "Options:"
         options-summary
@@ -156,10 +160,10 @@
       {:exit-message (usage summary) :ok? true}
 
       errors ; errors => exit with description of errors
-      {:exit-message (error-msg errors)}
+      {:exit-message (error-msg errors) :ok? false}
 
-      :else ; default action
-      {:options options})))
+      :else ; successful parse => return options
+      {:action :run :options options})))
 
 
 ;; Main Function
@@ -182,7 +186,11 @@
                     (name (:metric options))
                     " (inflation=" (:inflation options) ")..."))
 
-      (let [result (cluster-initiae initiae options)]
+      (let [result (cluster-initiae initiae 
+                                    :metric (:metric options)
+                                    :inflation (:inflation options)
+                                    :max-iterations (:max-iterations options)
+                                    :tolerance (:tolerance options))]
         (print-clustering-results result)
 
         (when-let [output-file (:output options)]
@@ -199,11 +207,14 @@
 (defn -main
   "Main entry point for the application."
   [& args]
-  (let [{:keys [options exit-message ok?]} (validate-args args)]
+  (let [{:keys [action options exit-message ok?]} (validate-args args)]
     (if exit-message
       (do (println exit-message)
           (System/exit (if ok? 0 1)))
-      (run-analysis options))))
+      (case action
+        :run (run-analysis options)
+        (do (println "Unknown action")
+            (System/exit 1))))))
 
 
 ;; Development helpers
