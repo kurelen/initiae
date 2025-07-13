@@ -1,6 +1,7 @@
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (ns clustering-analysis
-  (:require [nextjournal.clerk :as clerk]
+  (:require [clojure.string :refer [join]]
+            [nextjournal.clerk :as clerk]
             [initiae.matrix :as matrix]
             [initiae.character-costs :as costs]
             [initiae.text-metric :as metric]
@@ -115,7 +116,7 @@
             (:converged result)
             (:iterations result)
             (:num-clusters result)
-            (clojure.string/join ", " (:cluster-sizes result))])})
+            (join ", " (:cluster-sizes result))])})
 
 
 ;; ## Detailed Clustering Results
@@ -132,7 +133,7 @@
   (for [[i cluster] (map-indexed vector labeled-clusters)]
     {:cluster (str "Cluster " (inc i))
      :size (count cluster)
-     :members (clojure.string/join "; " cluster)}))
+     :members (join "; " cluster)}))
 
 
 ^{:nextjournal.clerk/visibility {:result :show}}
