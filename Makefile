@@ -1,13 +1,16 @@
-.PHONY: all run test lint format clean uberjar help
+.PHONY: all run clerk test lint format clean uberjar help
 
 run:
 	clojure -M:run
+
+clerk:
+	clojure -X:clerk
 
 test:
 	clojure -M:test
 
 lint:
-	clojure -M:lint --lint src test build.clj
+	clojure -M:lint --lint src dev notebooks test build.clj
 
 format:
 	clojure -M:format fix
@@ -23,6 +26,7 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  run       Run the application"
+	@echo "  clerk     Build a clerk notebook"
 	@echo "  test      Run unit tests"
 	@echo "  lint      Lint the source and test code"
 	@echo "  format    Format Clojure code"
