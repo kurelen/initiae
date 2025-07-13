@@ -6,7 +6,8 @@
 (m/set-current-implementation :vectorz)
 
 
-(defn normalize-columns [matrix]
+(defn normalize-columns
+  [matrix]
   (let [cols (m/columns matrix)
         col-sums (map #(m/esum %) cols)]
     (->> (map (fn [col sum]

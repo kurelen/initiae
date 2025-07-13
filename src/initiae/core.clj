@@ -1,9 +1,9 @@
 (ns initiae.core
   (:gen-class)
   (:require
+    [clojure.core.matrix :as m]
     [clojure.edn :as edn]
     [clojure.java.io :as io]
-    [clojure.core.matrix :as m]
     [clojure.pprint :refer [pprint]]
     [clojure.string :refer [join]]
     [initiae.clustering :as c]
@@ -57,16 +57,17 @@
    ["Weighted Levenshtein distance" (metric/weighted-levenshtein-dist-fn generated-weight-fn)]
    ["Weighted Levenshtein similarity" (metric/weighted-levenshtein-sim-fn generated-weight-fn)]])
 
+
 (defn -main
   [& _]
   (let [v (load-fixture-list)]
     (-> (metric/weighted-levenshtein-sim-fn generated-weight-fn)
-        (matrix/symmetric (load-fixture-list))
-        ;(print-matrix v)
+        (matrix/symmetric v)
+        ; (print-matrix v)
         (m/matrix)
         (c/run-mcl 4.0 100 1e-5)
         (c/extract-clusters)
-        println)))
+        pprint)))
 
 
 (comment (defn -main
@@ -77,4 +78,4 @@
     (doseq [[s f] named-fns]
       (println s)
       (print-matrix initiae (matrix/symmetric f initiae))
-      (pprint)))))
+      (println)))))
