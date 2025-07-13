@@ -8,43 +8,17 @@
     [clojure.tools.cli :refer [parse-opts]]
     [initiae.character-costs :as costs]
     [initiae.matrix :as matrix]
-    ;; Updated namespace name
     [initiae.mcl :as mcl]
     [initiae.text-metric :as metric]))
 
 
 ;; Data Loading Functions
 
-(defn load-fixture-edn
-  "Load initiae data from EDN file."
-  []
-  (with-open [r (io/reader (io/resource "fixtures/initia_variants.edn"))]
-    (edn/read (java.io.PushbackReader. r))))
-
-
-(defn flatten-fixture
-  "Flatten the nested EDN structure into a simple list of initiae."
-  [data]
-  (->> data
-       (mapcat #(reduce into [] (vals %)))))
-
-
-(defn load-fixture-list
+(defn load-initiae
   "Load initiae from a simple text file, one per line."
   []
   (with-open [r (io/reader (io/resource "fixtures/initiae.txt"))]
     (vec (line-seq r))))
-
-
-(defn load-initiae
-  "Load initiae from available sources. Tries text file first, then EDN."
-  []
-  (or (try (load-fixture-list)
-           (catch Exception _))
-      (try (flatten-fixture (load-fixture-edn))
-           (catch Exception _))
-      (throw (ex-info "No initiae data found"
-                      {:tried ["fixtures/initiae.txt" "fixtures/initia_variants.edn"]}))))
 
 
 ;; Analysis Functions
