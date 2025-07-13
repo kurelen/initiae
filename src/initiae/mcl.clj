@@ -1,10 +1,13 @@
 (ns initiae.mcl
-  (:require [clojure.core.matrix :as m]))
+  (:require
+    [clojure.core.matrix :as m]))
+
 
 (defn prune-matrix
   "Remove values below threshold to keep matrix sparse."
   [matrix threshold]
   (m/emap #(if (< % threshold) 0.0 %) matrix))
+
 
 (defn normalize-columns
   "Normalize each column to sum to 1."
@@ -19,15 +22,18 @@
       (m/pow inflation-param)
       normalize-columns))
 
+
 (defn expand
   "Apply expansion step: matrix multiplication with itself."
   [matrix]
   (m/mmul matrix matrix))
 
+
 (defn has-converged?
   "Check if matrix has converged by comparing with previous iteration."
   [matrix prev-matrix tolerance]
   (< (m/distance matrix prev-matrix) tolerance))
+
 
 (defn extract-clusters
   "Extract clusters from converged MCL matrix."
@@ -40,6 +46,7 @@
       (for [i (range n)
             :when (> (m/mget matrix i attractor) tolerance)]
         i))))
+
 
 (defn mcl
   "Perform Markov Clustering on similarity matrix.
@@ -62,17 +69,18 @@
       {:converged false
        :iterations iteration
        :clusters (extract-clusters matrix tolerance)}
-      
+
       (and prev-matrix (has-converged? matrix prev-matrix tolerance))
       {:converged true
        :iterations iteration
        :clusters (extract-clusters matrix tolerance)}
-      
+
       :else
       (let [expanded (expand matrix)
             inflated (inflate expanded inflation)
             pruned (prune-matrix inflated prune-threshold)]
         (recur pruned matrix (inc iteration))))))
+
 
 (defn cluster-with-labels
   "Cluster incipits and return results with original labels/indices."
@@ -84,6 +92,7 @@
            (for [cluster clusters]
              (mapv #(nth incipits %) cluster)))))
 
+
 ;; Utility functions for analysis
 (defn cluster-stats
   "Generate statistics about clustering results."
@@ -93,6 +102,7 @@
    :largest-cluster (apply max (map count clusters))
    :smallest-cluster (apply min (map count clusters))
    :singletons (count (filter #(= 1 (count %)) clusters))})
+
 
 (defn print-clusters
   "Pretty print clustering results."
