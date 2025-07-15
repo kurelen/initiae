@@ -160,7 +160,7 @@
       (is (= (first (:labeled-clusters result)) ["single item"]))))
 
   (testing "Empty initiae list"
-    (is (nil? (core/cluster-initiae []))))
+    (is (not (nil? (core/cluster-initiae [])))))
 
   (testing "Identical initiae cluster together"
     (let [identical-initiae ["same text" "same text" "same text"]
