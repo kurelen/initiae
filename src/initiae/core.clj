@@ -96,11 +96,16 @@
     (println (str "## " metric-name ", Iterations: " iterations ", Tolerance: " tolerance ", Inflation: " inflation))
     (println)
     (println (str "Converged: " converged ", Iterations: " iterations))
+    (println)
     (println (str "Found " (count labeled-clusters) " clusters:"))
     (println)
     (mcl/print-clusters labeled-clusters)
+    (println)
+    (println "```")
     (println "=== Cluster Statistics ===")
-    (pprint (mcl/cluster-stats (:clusters result)))))
+    (pprint (mcl/cluster-stats (:clusters result)))
+    (println "```")
+    (println)))
 
 
 (defn export-results
