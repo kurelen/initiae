@@ -93,7 +93,7 @@
   (let [{:keys [metric-name converged iterations labeled-clusters]} result
         {:keys [tolerance inflation]} options]
     (println)
-    (println (str "## " metric-name ", Iterations: " iterations ", Tolerance: " tolerance ", Inflation: " inflation ))
+    (println (str "## " metric-name ", Iterations: " iterations ", Tolerance: " tolerance ", Inflation: " inflation))
     (println)
     (println (str "Converged: " converged ", Iterations: " iterations))
     (println (str "Found " (count labeled-clusters) " clusters:"))
@@ -175,10 +175,11 @@
   "Run the complete clustering analysis."
   [options]
   (try
+    (when (:verbose options)
+      (println "Loading initiae data..."))
     (let [initiae (load-initiae)]
 
       (when (:verbose options)
-        (println "Loading initiae data...")
         (println (str "Loaded " (count initiae) " initiae"))
         (println "Sample initiae:")
         (doseq [incipit initiae]
@@ -186,7 +187,7 @@
         (println)
         (println (str "Running clustering with "
                       (name (:metric options))
-                    " (inflation=" (:inflation options) ")...")))
+                      " (inflation=" (:inflation options) ")...")))
 
 
       (let [result (cluster-initiae initiae
