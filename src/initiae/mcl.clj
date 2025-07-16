@@ -75,7 +75,7 @@
          prev-matrix nil
          iteration 0]
     (cond
-      (>= iteration max-iterations)
+      (<= max-iterations iteration)
       {:converged false
        :iterations iteration
        :clusters (extract-clusters matrix tolerance)}
