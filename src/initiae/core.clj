@@ -89,15 +89,23 @@
 
 (defn print-clustering-results
   "Pretty print clustering results."
-  [result]
-  (let [{:keys [metric-name converged iterations labeled-clusters]} result]
-    (println (str "=== Clustering Results (" metric-name ") ==="))
+  [result options]
+  (let [{:keys [metric-name converged iterations labeled-clusters]} result
+        {:keys [tolerance inflation]} options]
+    (println)
+    (println (str "## " metric-name ", Iterations: " iterations ", Tolerance: " tolerance ", Inflation: " inflation))
+    (println)
     (println (str "Converged: " converged ", Iterations: " iterations))
+    (println)
     (println (str "Found " (count labeled-clusters) " clusters:"))
     (println)
     (mcl/print-clusters labeled-clusters)
+    (println)
+    (println "```")
     (println "=== Cluster Statistics ===")
-    (pprint (mcl/cluster-stats (:clusters result)))))
+    (pprint (mcl/cluster-stats (:clusters result)))
+    (println "```")
+    (println)))
 
 
 (defn export-results
@@ -172,26 +180,27 @@
   "Run the complete clustering analysis."
   [options]
   (try
-    (println "Loading initiae data...")
+    (when (:verbose options)
+      (println "Loading initiae data..."))
     (let [initiae (load-initiae)]
-      (println (str "Loaded " (count initiae) " initiae"))
 
       (when (:verbose options)
+        (println (str "Loaded " (count initiae) " initiae"))
         (println "Sample initiae:")
-        (doseq [incipit (take 5 initiae)]
+        (doseq [incipit initiae]
           (println (str "  " incipit)))
-        (println))
+        (println)
+        (println (str "Running clustering with "
+                      (name (:metric options))
+                      " (inflation=" (:inflation options) ")...")))
 
-      (println (str "Running clustering with "
-                    (name (:metric options))
-                    " (inflation=" (:inflation options) ")..."))
 
       (let [result (cluster-initiae initiae
                                     :metric (:metric options)
                                     :inflation (:inflation options)
                                     :max-iterations (:max-iterations options)
                                     :tolerance (:tolerance options))]
-        (print-clustering-results result)
+        (print-clustering-results result options)
 
         (when-let [output-file (:output options)]
           (export-results result output-file))

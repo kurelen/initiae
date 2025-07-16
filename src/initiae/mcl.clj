@@ -202,10 +202,9 @@
   "Pretty print clustering results."
   [labeled-clusters]
   (doseq [[i cluster] (map-indexed vector labeled-clusters)]
-    (println (str "Cluster " (inc i) " (" (count cluster) " items):"))
+    (println (str "- Cluster " (inc i) " (" (count cluster) " items):"))
     (doseq [item cluster]
-      (println (str "  " item)))
-    (println)))
+      (println (str "  - " item)))))
 
 
 ;; Additional analysis functions
