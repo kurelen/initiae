@@ -67,10 +67,10 @@
       ;; After squaring and normalizing
       ;; Column 1: [0.36, 0.16] -> [0.36/0.52, 0.16/0.52] = [0.692..., 0.307...]
       ;; Column 2: [0.04, 0.64] -> [0.04/0.68, 0.64/0.68] = [0.058..., 0.941...]
-      (similiar? (m/mget inflated 0 0) (/ 0.36 0.52))
-      (similiar? (m/mget inflated 1 0) (/ 0.16 0.52))
-      (similiar? (m/mget inflated 0 1) (/ 0.04 0.68))
-      (similiar? (m/mget inflated 1 1) (/ 0.64 0.68)))))
+      (is (similiar? (m/mget inflated 0 0) (/ 0.36 0.52)))
+      (is (similiar? (m/mget inflated 1 0) (/ 0.16 0.52)))
+      (is (similiar? (m/mget inflated 0 1) (/ 0.04 0.68)))
+      (is (similiar? (m/mget inflated 1 1) (/ 0.64 0.68))))))
 
 
 (deftest test-expand
@@ -101,19 +101,36 @@
       (is (false? (mcl/has-converged? matrix1 matrix2 0.0001))))))
 
 
-(deftest test-extract-clusters
-  (testing "Cluster extraction from converged matrix"
+(deftest test-extract-clusters-complete
+  (testing "Complete cluster extraction from converged matrix"
     (let [;; A converged matrix with clear attractors
           matrix (m/matrix [[0.9 0.0 0.1]
                             [0.1 0.0 0.0]
                             [0.0 1.0 0.9]])
-          clusters (mcl/extract-clusters matrix 0.05)]
+          clusters (mcl/extract-clusters-complete matrix 0.05)]
 
-      (is (= 2 (count clusters)))
-      ;; First cluster should contain nodes 0 and possibly 2
-      ;; Second cluster should contain node 2
-      (is (some #(contains? (set %) 0) clusters))
-      (is (some #(contains? (set %) 2) clusters)))))
+      ;; Should assign all nodes
+      (let [all-nodes (set (apply concat clusters))]
+        (is (= #{0 1 2} all-nodes)))
+
+      ;; Should have at least one cluster
+      (is (>= (count clusters) 1))
+      (is (<= (count clusters) 3)))))
+
+
+(deftest test-extract-clusters-threshold-based
+  (testing "Threshold-based cluster extraction"
+    (let [matrix (m/matrix [[0.9 0.0 0.1]
+                            [0.0 0.9 0.0]
+                            [0.1 0.0 0.9]])
+          clusters (mcl/extract-clusters-threshold-based matrix 0.05 0.05)]
+
+      ;; Should assign all nodes
+      (let [all-nodes (set (apply concat clusters))]
+        (is (= #{0 1 2} all-nodes)))
+
+      ;; With this matrix structure, we expect separate clusters
+      (is (>= (count clusters) 2)))))
 
 
 (deftest test-mcl-simple-case
@@ -128,13 +145,19 @@
       (is (contains? result :converged))
       (is (contains? result :iterations))
       (is (contains? result :clusters))
+      (is (contains? result :matrix))
       (is (boolean? (:converged result)))
       (is (number? (:iterations result)))
       (is (sequential? (:clusters result)))
 
       ;; Should find some clusters
       (is (> (count (:clusters result)) 0))
-      (is (<= (count (:clusters result)) 3))))) ; At most as many clusters as nodes
+      (is (<= (count (:clusters result)) 3)) ; At most as many clusters as nodes
+
+      ;; All nodes should be assigned
+      (let [all-nodes (set (apply concat (:clusters result)))]
+        (is (= #{0 1 2} all-nodes))))))
+
 
 (deftest test-cluster-with-labels
   (testing "Clustering with labels"
@@ -150,7 +173,9 @@
       ;; Each cluster should contain actual items, not indices
       (let [all-items (flatten (:labeled-clusters result))]
         (is (every? string? all-items))
-        (is (every? #(contains? (set items) %) all-items))))))
+        (is (every? #(contains? (set items) %) all-items))
+        ;; All items should be present
+        (is (= (set items) (set all-items)))))))
 
 
 (deftest test-cluster-stats
@@ -162,7 +187,9 @@
       (is (= [2 1 3] (:cluster-sizes stats)))
       (is (= 3 (:largest-cluster stats)))
       (is (= 1 (:smallest-cluster stats)))
-      (is (= 1 (:singletons stats))))))
+      (is (= 1 (:singletons stats)))
+      (is (= 6 (:total-nodes stats)))
+      (is (empty? (:missing-nodes stats))))))
 
 
 (deftest test-mcl-edge-cases
@@ -171,7 +198,7 @@
     (let [matrix (m/matrix [[1.0]])
           result (mcl/mcl matrix)]
       (is (= 1 (count (:clusters result))))
-      (is (= [[0]] (:clusters result))))
+      (is (= #{0} (set (apply concat (:clusters result))))))
 
     ;; Identity matrix (no connections)
     (let [matrix (m/matrix [[1.0 0.0 0.0]
@@ -179,7 +206,10 @@
                             [0.0 0.0 1.0]])
           result (mcl/mcl matrix :inflation 2.0)]
       (is (>= (count (:clusters result)) 1))
-      (is (<= (count (:clusters result)) 3)))))
+      (is (<= (count (:clusters result)) 3))
+      ;; All nodes should be assigned
+      (let [all-nodes (set (apply concat (:clusters result)))]
+        (is (= #{0 1 2} all-nodes))))))
 
 
 (deftest test-mcl-parameters
@@ -196,7 +226,13 @@
 
       ;; Both should converge with reasonable iterations
       (is (<= (:iterations result-low) 100))
-      (is (<= (:iterations result-high) 100)))))
+      (is (<= (:iterations result-high) 100))
+
+      ;; All nodes should be assigned in both cases
+      (let [all-nodes-low (set (apply concat (:clusters result-low)))
+            all-nodes-high (set (apply concat (:clusters result-high)))]
+        (is (= #{0 1 2} all-nodes-low))
+        (is (= #{0 1 2} all-nodes-high))))))
 
 
 (deftest test-print-clusters
@@ -204,3 +240,55 @@
     (let [clusters [["item1" "item2"] ["item3"]]]
       ;; Just test that it doesn't throw an exception
       (is (not (nil? (with-out-str (mcl/print-clusters clusters))))))))
+
+
+(deftest test-ensure-complete-parameter
+  (testing "ensure-complete parameter works correctly"
+    (let [similarity-matrix (m/matrix [[1.0 0.1 0.0]
+                                       [0.1 1.0 0.0]
+                                       [0.0 0.0 1.0]])
+          result-complete (mcl/mcl similarity-matrix
+                                   :inflation 2.0
+                                   :ensure-complete true)
+          result-incomplete (mcl/mcl similarity-matrix
+                                     :inflation 2.0
+                                     :ensure-complete false)]
+
+      ;; With ensure-complete=true, all nodes should be assigned
+      (let [all-nodes (set (apply concat (:clusters result-complete)))]
+        (is (= #{0 1 2} all-nodes)))
+
+      ;; Both should produce valid results
+      (is (> (count (:clusters result-complete)) 0))
+      (is (> (count (:clusters result-incomplete)) 0)))))
+
+
+(deftest test-analyze-convergence
+  (testing "Convergence analysis function"
+    (let [matrix (m/matrix [[1.0 0.8 0.1]
+                            [0.8 1.0 0.1]
+                            [0.1 0.1 1.0]])
+          results (mcl/analyze-convergence matrix :inflations [1.5 2.0 2.5])]
+
+      (is (= 3 (count results)))
+      (is (every? #(contains? % :inflation) results))
+      (is (every? #(contains? % :converged) results))
+      (is (every? #(contains? % :num-clusters) results))
+      (is (every? #(contains? % :cluster-sizes) results)))))
+
+
+(deftest test-find-optimal-inflation
+  (testing "Finding optimal inflation parameter"
+    (let [matrix (m/matrix [[1.0 0.8 0.1]
+                            [0.8 1.0 0.1]
+                            [0.1 0.1 1.0]])
+          result (mcl/find-optimal-inflation matrix 2
+                                             :min-inflation 1.5
+                                             :max-inflation 3.0
+                                             :steps 5)]
+
+      (is (contains? result :inflation))
+      (is (contains? result :num-clusters))
+      (is (contains? result :diff))
+      (is (number? (:inflation result)))
+      (is (<= 1.5 (:inflation result) 3.0)))))

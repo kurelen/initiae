@@ -3,8 +3,7 @@
     [clojure.core.matrix :as m]
     [clojure.set :refer [subset?]]
     [clojure.test :refer [deftest is testing]]
-    [initiae.core :as core]
-    [initiae.text-metric :as metric]))
+    [initiae.core :as core]))
 
 
 ;; Test data

@@ -67,7 +67,7 @@
   [initiae & {:keys [metric inflation max-iterations tolerance]
               :or {metric :weighted-lev-sim
                    inflation 2.0
-                   max-iterations 100
+                   max-iterations 2
                    tolerance 1e-6}}]
   (let [analysis (analyze-similarities initiae metric)
         clustering-result (mcl/cluster-with-labels
@@ -114,7 +114,7 @@
     :default :weighted-lev-sim
     :parse-fn keyword
     :validate [#(contains? available-metrics %)
-               (str "Must be one of " (keys available-metrics))]]
+               (str "Must be one of\n  " (str/join "\n  " (map name (keys available-metrics))))]]
    ["-i" "--inflation FLOAT" "MCL inflation parameter"
     :default 2.0
     :parse-fn #(Double/parseDouble %)]
@@ -122,7 +122,7 @@
     :default 1e-6
     :parse-fn #(Double/parseDouble %)]
    ["-r" "--max-iterations INT" "Maximum iterations for MCL"
-    :default 100
+    :default 2
     :parse-fn #(Integer/parseInt %)]
    ["-o" "--output FILE" "Output file for results"]
    ["-v" "--verbose" "Verbose output"]
