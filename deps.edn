@@ -8,15 +8,20 @@
 
  :aliases
  {:run {:main-opts ["-m" "initiae.core"]}
+  
+  :repl {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}
+                      cider/cider-nrepl {:mvn/version "0.30.0"}}
+         :main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}
 
- :repl {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}
-                     cider/cider-nrepl {:mvn/version "0.30.0"}}
-        :main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}
-
-   :clerk {:extra-deps {io.github.nextjournal/clerk {:mvn/version "0.16.1016"}}
+  :clerk {:extra-deps {io.github.nextjournal/clerk {:mvn/version "0.16.1016"}}
+          :extra-paths ["notebooks"]
           :exec-fn nextjournal.clerk/build!
-          :exec-args {:paths ["notebooks"]
-                      :out-path "docs"}}
+          :exec-args {:paths ["src/initiae/mcl_visualization.clj"]}}
+  
+  :serve {:extra-deps {io.github.nextjournal/clerk {:mvn/version "0.16.1016"}}
+          :extra-paths ["notebooks" "src"]
+          :main-opts ["-e" "(require '[nextjournal.clerk :as clerk])"
+                      "-e" "(clerk/serve! {:watch-paths [\"src/initiae\"] :port 7777})"]} 
   
   :test {:extra-paths ["test"]
          :extra-deps {io.github.cognitect-labs/test-runner
