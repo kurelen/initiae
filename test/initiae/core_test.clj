@@ -119,7 +119,7 @@
     (is (= (get-in result [:options :metric]) :weighted-lev-sim))
     (is (= (get-in result [:options :inflation]) 2.0))
     (is (= (get-in result [:options :tolerance]) 1e-6))
-    (is (= (get-in result [:options :max-iterations]) 100))))
+    (is (= (get-in result [:options :max-iterations]) 2))))
 
 
 (deftest test-metric-functions-work
