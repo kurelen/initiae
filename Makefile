@@ -1,4 +1,4 @@
-.PHONY: all run clerk test lint format clean uberjar help
+.PHONY: all run clerk serve test lint format clean uberjar help
 
 run:
 	clojure -M:run
@@ -6,8 +6,8 @@ run:
 clerk:
 	clojure -X:clerk
 
-clerk-serve:
-	clojure -M -e "(require '[nextjournal.clerk :as clerk]) (clerk/serve! {:browse? true}) (clerk/show! \"notebooks/clustering_analysis.clj\")"
+serve:
+	clojure -M:serve
 
 test:
 	clojure -M:test
@@ -30,6 +30,7 @@ help:
 	@echo "Targets:"
 	@echo "  run       Run the application"
 	@echo "  clerk     Build a clerk notebook"
+	@echo "  serve     Live code a clerk notebook"
 	@echo "  test      Run unit tests"
 	@echo "  lint      Lint the source and test code"
 	@echo "  format    Format Clojure code"
