@@ -15,8 +15,8 @@
 
   :clerk {:extra-deps {io.github.nextjournal/clerk {:mvn/version "0.16.1016"}}
           :extra-paths ["notebooks"]
-          :exec-fn nextjournal.clerk/build!
-          :exec-args {:paths ["src/initiae/mcl_visualization.clj"]}}
+          :main-opts ["-e" "(require '[nextjournal.clerk :as clerk])"
+                      "-e" "(clerk/build! {:paths [\"notebooks/*\"]})"]} 
   
   :serve {:extra-deps {io.github.nextjournal/clerk {:mvn/version "0.16.1016"}}
           :extra-paths ["notebooks" "src"]
